@@ -6,13 +6,17 @@ const PokemonCard = ({ pokemon }) => {
     return <div>Loading...</div>;
   }
 
-  const { id, name, sprites, stats, types } = pokemon;
+  const { name, sprites, stats, types } = pokemon;
 
   return (
     <div className="pokemon-card">
       <h3 className="pokemon-name">{name}</h3>
       <img
-        src={sprites.other.dream_world.front_default}
+        src={
+          sprites.other.dream_world.front_default === null
+            ? sprites.front_default
+            : sprites.other.dream_world.front_default
+        }
         alt={name}
         className="pokemon-image"
       />

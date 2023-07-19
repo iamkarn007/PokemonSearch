@@ -3,7 +3,6 @@ import './PokemonSearchApp.css';
 import SearchBar from './SearchBar';
 import PokemonCard from './PokemonCard';
 import Pagination from './Pagination';
-import pokemonLogo from './pokemonlogo.png'; // Import the PNG image
 
 const PokemonSearchApp = () => {
   const [pokemons, setPokemons] = useState([]);
@@ -16,20 +15,38 @@ const PokemonSearchApp = () => {
   }, []);
 
   const fetchPokemons = async () => {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=1000`);
-    const data = await response.json();
-    setTotalPages(Math.ceil(data.count / 10));
-    const allPokemons = await fetchAllPokemonDetails(data.results);
-    setPokemons(allPokemons);
+    try {
+      const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=1000`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch Pokémon data');
+      }
+      const data = await response.json();
+      const totalPages = Math.min(100, Math.ceil(data.count / 10)); // Limit to 100 pages
+      setTotalPages(totalPages);
+      const allPokemons = await fetchAllPokemonDetails(data.results.slice(0, totalPages * 10));
+      setPokemons(allPokemons);
+    } catch (error) {
+      console.error('Error fetching Pokémon data:', error);
+      // Handle the error or display an error message to the user
+    }
   };
 
   const fetchAllPokemonDetails = async (pokemonList) => {
-    const promises = pokemonList.map(async (pokemon) => {
-      const response = await fetch(pokemon.url);
-      return response.json();
-    });
-    const results = await Promise.all(promises);
-    return results;
+    try {
+      const promises = pokemonList.map(async (pokemon) => {
+        const response = await fetch(pokemon.url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch Pokémon details');
+        }
+        return response.json();
+      });
+      const results = await Promise.all(promises);
+      return results;
+    } catch (error) {
+      console.error('Error fetching Pokémon details:', error);
+      // Handle the error or display an error message to the user
+      return [];
+    }
   };
 
   const handleSearch = (searchTerm) => {
@@ -45,6 +62,10 @@ const PokemonSearchApp = () => {
     setCurrentPage((prevPage) => prevPage + 1);
   };
 
+  const handlePageClick = (page) => {
+    setCurrentPage(page);
+  };
+
   const filteredPokemons = pokemons.filter((pokemon) =>
     pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -54,9 +75,7 @@ const PokemonSearchApp = () => {
 
   return (
     <div className="container">
-      <div className="heading-container">
-        <h1 className="heading">Pokemon Search App</h1>
-      </div>
+      <h1 className="heading">Pokemon Search App</h1>
       <SearchBar searchTerm={searchTerm} onSearch={handleSearch} />
       <div className="pokemon-list">
         {displayedPokemons.map((pokemon) => (
@@ -68,6 +87,7 @@ const PokemonSearchApp = () => {
         totalPages={totalPages}
         onPreviousPage={handlePreviousPage}
         onNextPage={handleNextPage}
+        onPageClick={handlePageClick}
       />
     </div>
   );
