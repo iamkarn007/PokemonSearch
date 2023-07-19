@@ -36,3 +36,42 @@
     transform: rotate(360deg);
   }
 }
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f8f8;
+}
+
+
+.pokemonlist{
+  width: 100%;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.heading-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pokemon-logo {
+  width: 70px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.heading {
+  font-size: 24px;
+  color: #333;
+}
